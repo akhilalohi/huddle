@@ -1,0 +1,42 @@
+<%- include('../partials/header') %>
+<h1>Shopping Cart</h1>
+
+<% if (items.length === 0) { %>
+  <p class="muted">Your cart is empty. <a href="/products">Start shopping</a> or <a href="/deals">join a group deal</a>.</p>
+<% } else { %>
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Product</th><th>Price</th><th>Quantity</th><th>Subtotal</th><th></th></tr></thead>
+      <tbody>
+        <% items.forEach(function (entry) { var id = entry[0], item = entry[1]; %>
+          <tr>
+            <td class="cell-product">
+              <img src="<%= imgSrc(item) %>" alt="">
+              <div><a href="/products/<%= id %>"><%= item.title %></a><br><small class="muted"><%= item.productCode %></small></div>
+            </td>
+            <td><%= money(item.price) %></td>
+            <td>
+              <form action="/cart/update/<%= id %>" method="post" class="inline-form">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input type="number" name="qty" value="<%= item.qty %>" min="0" max="10" aria-label="Quantity">
+                <button class="btn btn-small" type="submit">Update</button>
+              </form>
+            </td>
+            <td><strong><%= money(item.qty * item.price) %></strong></td>
+            <td>
+              <form action="/cart/remove/<%= id %>" method="post">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="btn btn-small btn-ghost" type="submit">Remove</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <div class="cart-total">
+    <div>Total (<%= cart.totalQty %> item<%= cart.totalQty === 1 ? '' : 's' %>): <strong><%= money(cart.totalCost) %></strong></div>
+    <a class="btn" href="/cart/checkout">Checkout</a>
+  </div>
+<% } %>
+<%- include('../partials/footer') %>

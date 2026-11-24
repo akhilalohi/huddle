@@ -1,0 +1,39 @@
+<%- include('../partials/header') %>
+
+<div class="section-head">
+  <h1><%= pageName %></h1>
+  <span class="muted"><%= count %> product<%= count === 1 ? '' : 's' %></span>
+</div>
+
+<form class="toolbar" action="/products" method="get">
+  <% if (search) { %><input type="hidden" name="search" value="<%= search %>"><% } %>
+  <% if (categorySlug) { %><input type="hidden" name="category" value="<%= categorySlug %>"><% } %>
+  <label>Sort by
+    <select name="sort" onchange="this.form.submit()">
+      <option value="newest" <%= sort === 'newest' ? 'selected' : '' %>>Newest</option>
+      <option value="price_asc" <%= sort === 'price_asc' ? 'selected' : '' %>>Price: low to high</option>
+      <option value="price_desc" <%= sort === 'price_desc' ? 'selected' : '' %>>Price: high to low</option>
+    </select>
+  </label>
+  <noscript><button class="btn" type="submit">Apply</button></noscript>
+</form>
+
+<% if (products.length === 0) { %>
+  <p class="muted center">Nothing matched. Try a different word, or <a href="/products">browse everything</a>.</p>
+<% } else { %>
+  <div class="grid">
+    <% products.forEach(function (product) { %>
+      <%- include('../partials/product-card', { product: product, deal: dealByProduct[String(product._id)] || null }) %>
+    <% }) %>
+  </div>
+<% } %>
+
+<% if (pages > 1) { %>
+  <nav class="pager" aria-label="Pages">
+    <% for (var i = 1; i <= pages; i++) { %>
+      <a href="/products?<%= baseQuery ? baseQuery + '&' : '' %>page=<%= i %>" class="<%= i === page ? 'current' : '' %>"><%= i %></a>
+    <% } %>
+  </nav>
+<% } %>
+
+<%- include('../partials/footer') %>

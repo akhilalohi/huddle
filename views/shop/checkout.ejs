@@ -1,0 +1,13 @@
+<%- include('../partials/header') %>
+<section class="narrow">
+  <h1>Checkout</h1>
+  <p class="summary-line"><%= cart.totalQty %> item<%= cart.totalQty === 1 ? '' : 's' %> &middot; <strong><%= money(cart.totalCost) %></strong></p>
+  <%- include('../partials/errors', { errors: errors }) %>
+
+  <form action="/cart/checkout" method="post" class="form" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <%- include('../partials/card-fields', { form: form }) %>
+    <button class="btn btn-block" type="submit">Pay <%= money(cart.totalCost) %></button>
+  </form>
+</section>
+<%- include('../partials/footer') %>

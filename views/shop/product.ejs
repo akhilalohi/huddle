@@ -1,0 +1,46 @@
+<%- include('../partials/header') %>
+
+<nav class="crumbs"><a href="/products">Products</a> / <a href="/products?category=<%= product.category.slug %>"><%= product.category.title %></a> / <%= product.title %></nav>
+
+<section class="product-page">
+  <div class="product-img"><img src="<%= imgSrc(product) %>" alt="<%= product.title %>"></div>
+  <div class="product-info">
+    <h1><%= product.title %></h1>
+    <div class="price big"><%= money(product.price) %></div>
+    <div class="desc"><%= product.description %></div>
+    <dl class="facts">
+      <dt>Category</dt><dd><%= product.category.title %></dd>
+      <% if (product.manufacturer) { %><dt>Brand</dt><dd><%= product.manufacturer %></dd><% } %>
+      <dt>Product code</dt><dd><%= product.productCode %></dd>
+      <dt>Date added</dt><dd><%= product.createdAt.toDateString() %></dd>
+    </dl>
+    <% if (product.available) { %><span class="stock in">IN STOCK</span><% } else { %><span class="stock out">OUT OF STOCK</span><% } %>
+
+    <% if (deal) { %>
+      <a class="deal-banner" href="/deals/<%= deal._id %>">
+        <strong>&#9889; Group deal live</strong>
+        <span><%= snap.count %> joined &middot; now <%= money(snap.currentPrice) %>
+        <% if (snap.nextTier) { %>&middot; <%= snap.needed %> more &rarr; <%= money(snap.nextPrice) %><% } %></span>
+      </a>
+    <% } %>
+
+    <% if (product.available) { %>
+      <form action="/cart/add/<%= product._id %>" method="post" class="buy-row">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <label class="qty">Qty <input type="number" name="qty" value="1" min="1" max="10"></label>
+        <button class="btn" type="submit">Add to Shopping Cart</button>
+      </form>
+    <% } %>
+  </div>
+</section>
+
+<% if (related.length) { %>
+  <section>
+    <h2>More in <%= product.category.title %></h2>
+    <div class="grid">
+      <% related.forEach(function (p) { %><%- include('../partials/product-card', { product: p }) %><% }) %>
+    </div>
+  </section>
+<% } %>
+
+<%- include('../partials/footer') %>
