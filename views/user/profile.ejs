@@ -1,0 +1,57 @@
+<%- include('../partials/header') %>
+
+<div class="section-head">
+  <h1>My Account</h1>
+  <span class="muted"><%= currentUser.email %></span>
+</div>
+
+<% if (saved > 0) { %>
+  <div class="notice ok">You've saved <strong><%= money(saved) %></strong> so far by shopping in huddles.</div>
+<% } %>
+
+<h2>Deals I've joined</h2>
+<% if (pledges.length === 0) { %>
+  <p class="muted">No active pledges. <a href="/deals">Find a group deal</a>.</p>
+<% } else { %>
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Product</th><th>Qty</th><th>Card hold</th><th>Deal ends</th><th>Joined so far</th></tr></thead>
+      <tbody>
+        <% pledges.forEach(function (p) { %>
+          <tr>
+            <td class="cell-product"><img src="<%= imgSrc(p.deal.product) %>" alt=""><a href="/deals/<%= p.deal._id %>"><%= p.deal.product.title %></a></td>
+            <td><%= p.qty %></td>
+            <td><%= money(p.authorizedAmount) %> <small class="muted">held</small></td>
+            <td><%= p.deal.endsAt.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' }) %></td>
+            <td><%= p.deal.participantCount %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
+<h2>My orders</h2>
+<% if (orders.length === 0) { %>
+  <p class="muted">No orders yet.</p>
+<% } else { %>
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Date</th><th>Items</th><th>Total</th><th>Type</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        <% orders.forEach(function (o) { %>
+          <tr>
+            <td><%= o.createdAt.toLocaleDateString('en-IN', { dateStyle: 'medium', timeZone: 'Asia/Kolkata' }) %></td>
+            <td><%= o.items.map(function (i) { return i.title + ' x' + i.qty; }).join(', ') %></td>
+            <td><%= money(o.totalCost) %></td>
+            <td><%= o.source === 'group-deal' ? 'Group deal' : 'Cart' %></td>
+            <td><span class="status s-<%= o.status.toLowerCase() %>"><%= o.status %></span></td>
+            <td><a href="/user/orders/<%= o._id %>">Details</a></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

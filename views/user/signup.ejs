@@ -1,0 +1,16 @@
+<%- include('../partials/header') %>
+<section class="narrow">
+  <h1>Sign Up</h1>
+  <%- include('../partials/errors', { errors: errors }) %>
+  <form action="/user/signup" method="post" class="form" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label>Name <input name="name" value="<%= form.name || '' %>" autocomplete="name" required></label>
+    <label>Email address <input type="email" name="email" value="<%= form.email || '' %>" autocomplete="email" required></label>
+    <label>Password <input type="password" name="password" minlength="8" autocomplete="new-password" required>
+      <small class="hint">At least 8 characters, with a letter and a number.</small></label>
+    <label>Verify Password <input type="password" name="password2" autocomplete="new-password" required></label>
+    <button class="btn" type="submit">Sign Up</button>
+  </form>
+  <p>Already have an account? <a href="/user/signin">Sign In</a></p>
+</section>
+<%- include('../partials/footer') %>

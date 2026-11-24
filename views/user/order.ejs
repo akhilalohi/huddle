@@ -1,0 +1,43 @@
+<%- include('../partials/header') %>
+<% var idx = states.indexOf(order.status); %>
+
+<nav class="crumbs"><a href="/user/profile">My Account</a> / Order</nav>
+<h1>Order details</h1>
+<p class="muted">Placed <%= order.createdAt.toLocaleString('en-IN', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Asia/Kolkata' }) %> &middot; ref <%= order.paymentRef %></p>
+
+<% if (order.status === 'Cancelled') { %>
+  <div class="notice">This order was cancelled.</div>
+<% } else { %>
+  <ol class="timeline" aria-label="Order status">
+    <% states.forEach(function (s, i) { %>
+      <li class="<%= i < idx ? 'done' : (i === idx ? 'current' : '') %>"><span class="dot"><%= i <= idx ? '✓' : i + 1 %></span><%= s %></li>
+    <% }) %>
+  </ol>
+<% } %>
+
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>Product</th><th>Qty</th><th>Price each</th><th>Subtotal</th></tr></thead>
+    <tbody>
+      <% order.items.forEach(function (i) { %>
+        <tr>
+          <td class="cell-product"><img src="<%= imgSrc(i) %>" alt=""><div><%= i.title %><br><small class="muted"><%= i.productCode %></small></div></td>
+          <td><%= i.qty %></td>
+          <td><%= money(i.unitPrice) %> <% if (i.listPrice > i.unitPrice) { %><s class="was"><%= money(i.listPrice) %></s><% } %></td>
+          <td><%= money(i.unitPrice * i.qty) %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<div class="cart-total">
+  <div>
+    <% if (order.totalSaved > 0) { %><div class="saved">You saved <%= money(order.totalSaved) %> with the group deal</div><% } %>
+    Total paid: <strong><%= money(order.totalCost) %></strong>
+    <div class="muted small">Card ending <%= order.cardLast4 %></div>
+  </div>
+  <div class="muted">Delivering to:<br><%= order.address %></div>
+</div>
+
+<%- include('../partials/footer') %>
