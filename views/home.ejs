@@ -1,0 +1,76 @@
+<%- include('partials/header') %>
+
+<section class="hero" aria-label="Featured">
+  <div class="slide active">
+    <div>
+      <p class="eyebrow">New on Huddle</p>
+      <h1>Shop together.<br>Pay less.</h1>
+      <p>Join a group deal. The more people who join, the lower the price drops &mdash; for everyone.</p>
+      <a class="btn btn-light" href="/deals">See live deals</a>
+    </div>
+    <div class="hero-art" aria-hidden="true"><span>5</span><span>15</span><span>30</span></div>
+  </div>
+  <div class="slide">
+    <div>
+      <p class="eyebrow">Summer collection</p>
+      <h1>Kurtis, dresses<br>&amp; more</h1>
+      <p>Browse the full catalogue and buy at list price any time, no waiting.</p>
+      <a class="btn btn-light" href="/products">Shop all</a>
+    </div>
+    <div class="hero-art alt" aria-hidden="true"><span>&#10047;</span></div>
+  </div>
+  <div class="slide">
+    <div>
+      <p class="eyebrow">Nobody loses</p>
+      <h1>No huddle?<br>No charge.</h1>
+      <p>Your card is only held while a deal runs. If it doesn't reach its goal, the hold is released automatically.</p>
+      <a class="btn btn-light" href="#how">How it works</a>
+    </div>
+    <div class="hero-art alt2" aria-hidden="true"><span>&#10003;</span></div>
+  </div>
+  <button class="hero-nav prev" aria-label="Previous slide" data-hero="-1">&lsaquo;</button>
+  <button class="hero-nav next" aria-label="Next slide" data-hero="1">&rsaquo;</button>
+</section>
+
+<section class="tiles" aria-label="Shop by category">
+  <a href="/products?category=men" class="tile">Men</a>
+  <a href="/products?category=women" class="tile">Women</a>
+  <a href="/products?category=kids" class="tile">Kids</a>
+  <a href="/deals" class="tile tile-deal">&#9889; Group Deals</a>
+</section>
+
+<section>
+  <div class="section-head">
+    <h2>Live group deals</h2>
+    <a href="/deals">See all &rarr;</a>
+  </div>
+  <% if (liveDeals.length === 0) { %>
+    <p class="muted">No live deals right now. Check back soon.</p>
+  <% } else { %>
+    <div class="grid">
+      <% liveDeals.forEach(function (item) { %><%- include('partials/deal-card', { item: item }) %><% }) %>
+    </div>
+  <% } %>
+</section>
+
+<section id="how" class="how">
+  <h2>How a group deal works</h2>
+  <ol class="steps">
+    <li><span>1</span><strong>Join</strong><p>Pledge for a product. Your card is only <em>held</em> at the list price.</p></li>
+    <li><span>2</span><strong>Invite</strong><p>Share the deal. Each new person can unlock a lower price tier.</p></li>
+    <li><span>3</span><strong>Timer ends</strong><p>If the first goal is reached, the deal goes ahead. If not, every hold is released.</p></li>
+    <li><span>4</span><strong>Everyone pays the final price</strong><p>Early joiners aren't punished: all pledges are charged the best tier reached.</p></li>
+  </ol>
+</section>
+
+<section>
+  <div class="section-head">
+    <h2>Latest products</h2>
+    <a href="/products">Browse all &rarr;</a>
+  </div>
+  <div class="grid">
+    <% latest.forEach(function (product) { %><%- include('partials/product-card', { product: product }) %><% }) %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>
