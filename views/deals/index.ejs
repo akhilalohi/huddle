@@ -1,0 +1,24 @@
+<%- include('../partials/header') %>
+
+<div class="section-head">
+  <h1>Group Deals</h1>
+</div>
+<p class="lead">Join a deal and invite friends. The price drops as the huddle grows, and you are only charged if the deal reaches its goal.</p>
+
+<h2>Live now</h2>
+<% if (open.length === 0) { %>
+  <p class="muted">No live deals right now. Check back soon.</p>
+<% } else { %>
+  <div class="grid">
+    <% open.forEach(function (item) { %><%- include('../partials/deal-card', { item: item }) %><% }) %>
+  </div>
+<% } %>
+
+<% if (ended.length) { %>
+  <h2>Recently ended</h2>
+  <div class="grid">
+    <% ended.forEach(function (item) { %><%- include('../partials/deal-card', { item: item }) %><% }) %>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

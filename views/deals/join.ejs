@@ -1,0 +1,37 @@
+<%- include('../partials/header') %>
+<% var topDiscount = deal.tiers.length ? deal.tiers[deal.tiers.length - 1].discountPercent : 0;
+   var bestPrice = Math.round(product.price * (1 - topDiscount / 100)); %>
+
+<section class="narrow">
+  <h1>Join the huddle</h1>
+
+  <div class="mini-product">
+    <img src="<%= imgSrc(product) %>" alt="">
+    <div>
+      <strong><%= product.title %></strong>
+      <div class="muted"><%= snap.count %> joined &middot; price now <%= money(snap.currentPrice) %></div>
+    </div>
+  </div>
+
+  <div class="notice">
+    <strong>How you're charged:</strong> we <em>hold</em> <%= money(product.price) %> per unit on your card now.
+    If the deal succeeds you're charged the final tier price (between <%= money(bestPrice) %> and <%= money(snap.currentPrice) %> per unit, depending on how many join).
+    If it doesn't reach <%= snap.tippingPoint %> people, the hold is released and you pay nothing.
+  </div>
+
+  <%- include('../partials/errors', { errors: errors }) %>
+
+  <form action="/deals/<%= deal._id %>/join" method="post" class="form" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label>Quantity
+      <select name="qty">
+        <% for (var q = 1; q <= deal.maxQtyPerPerson; q++) { %>
+          <option value="<%= q %>" <%= String(form.qty) === String(q) ? 'selected' : '' %>><%= q %></option>
+        <% } %>
+      </select>
+    </label>
+    <%- include('../partials/card-fields', { form: form }) %>
+    <button class="btn btn-block" type="submit">Hold my card &amp; join</button>
+  </form>
+</section>
+<%- include('../partials/footer') %>

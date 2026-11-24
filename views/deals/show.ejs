@@ -1,0 +1,139 @@
+<%- include('../partials/header') %>
+<% var isOpen = deal.status === 'open' && deal.endsAt > new Date(); %>
+
+<nav class="crumbs"><a href="/deals">Group Deals</a> / <%= product.title %></nav>
+
+<section class="product-page" data-live-deal="<%= deal._id %>" data-status="<%= deal.status %>" data-count="<%= snap.count %>">
+  <div class="product-img">
+    <img src="<%= imgSrc(product) %>" alt="<%= product.title %>">
+  </div>
+
+  <div class="product-info">
+    <% if (isOpen) { %>
+      <span class="chip time-chip static" data-countdown="<%= deal.endsAt.toISOString() %>"><%= timeLeft(deal.endsAt) %></span>
+    <% } else if (deal.status === 'succeeded') { %>
+      <span class="chip ok-chip static">Deal succeeded</span>
+    <% } else if (deal.status === 'failed') { %>
+      <span class="chip bad-chip static">Deal did not reach its goal</span>
+    <% } else { %>
+      <span class="chip time-chip static">Settling&hellip;</span>
+    <% } %>
+
+    <h1><%= product.title %></h1>
+
+    <% if (deal.status === 'succeeded') { %>
+      <div class="price-row"><span class="price big now"><%= money(deal.finalPrice) %></span><s class="was"><%= money(snap.basePrice) %></s></div>
+      <p class="muted">Final price for all <%= deal.finalParticipants %> participants.</p>
+    <% } else if (deal.status === 'failed') { %>
+      <div class="price big"><s><%= money(snap.basePrice) %></s></div>
+      <p class="muted"><%= deal.finalParticipants || 0 %> joined but <%= snap.tippingPoint %> were needed. Every card hold was released and nobody was charged.</p>
+    <% } else { %>
+      <div class="price-row">
+        <span class="price big now" data-live="price"><%= money(snap.currentPrice) %></span>
+        <% if (snap.currentPrice < snap.basePrice) { %><s class="was"><%= money(snap.basePrice) %></s><% } %>
+      </div>
+      <p class="muted">Price if the deal ended right now. Everyone pays the lowest tier reached when the timer ends.</p>
+    <% } %>
+
+    <!-- progress with tier markers -->
+    <div class="meter tall" role="progressbar" aria-valuenow="<%= snap.percentToTop %>" aria-valuemin="0" aria-valuemax="100">
+      <span data-live="meter" style="width: <%= snap.percentToTop %>%"></span>
+      <% tiers.forEach(function (t) { %>
+        <i class="marker <%= t.reached ? 'hit' : '' %>" style="left: <%= Math.round(t.minParticipants / snap.topTarget * 100) %>%" title="<%= t.minParticipants %> people: <%= t.discountPercent %>% off"></i>
+      <% }) %>
+    </div>
+    <div class="meter-note">
+      <strong data-live="count"><%= snap.count %></strong> joined
+      <% if (isOpen) { %>
+        <span data-live="goal">
+          <% if (!snap.thresholdMet) { %>&middot; needs <%= snap.tippingPoint - snap.count %> more to go ahead
+          <% } else if (snap.nextTier) { %>&middot; <%= snap.needed %> more people &rarr; <%= money(snap.nextPrice) %>
+          <% } else { %>&middot; best price unlocked<% } %>
+        </span>
+      <% } %>
+    </div>
+
+    <h3>Price ladder</h3>
+    <ol class="ladder">
+      <% tiers.forEach(function (t, i) { %>
+        <li class="<%= t.reached ? 'reached' : '' %>">
+          <span class="dot"><%= t.reached ? '✓' : (i + 1) %></span>
+          <span><strong><%= t.minParticipants %> people</strong>
+            <% if (i === 0) { %><small>(the deal goes ahead)</small><% } %></span>
+          <span class="ladder-price"><%= money(t.price) %> <small><%= t.discountPercent %>% off</small></span>
+        </li>
+      <% }) %>
+    </ol>
+
+    <!-- actions -->
+    <% if (isOpen) { %>
+      <% if (myPledge) { %>
+        <div class="notice ok">
+          <strong>You're in.</strong> <%= myPledge.qty %> unit<%= myPledge.qty === 1 ? '' : 's' %>, card ending <%= myPledge.cardLast4 %> held for <%= money(myPledge.authorizedAmount) %>.
+          You'll be charged the final tier price, which can only be lower than this.
+        </div>
+        <div class="actions">
+          <a class="btn" data-share="whatsapp" data-text="Join me on Huddle: <%= product.title %> is <%= money(snap.currentPrice) %> and dropping as more people join!" href="#">Invite on WhatsApp</a>
+          <button class="btn btn-ghost" type="button" data-copy>Copy link</button>
+          <form action="/deals/<%= deal._id %>/leave" method="post" class="inline" onsubmit="return confirm('Leave this deal? Your card hold will be released.');">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button class="btn btn-ghost" type="submit">Leave deal</button>
+          </form>
+        </div>
+      <% } else { %>
+        <div class="actions">
+          <a class="btn btn-lg" href="/deals/<%= deal._id %>/join">Join this deal</a>
+          <button class="btn btn-ghost" type="button" data-copy>Copy link</button>
+        </div>
+        <p class="hint">Joining only <em>holds</em> <%= money(snap.basePrice) %> on your card. You can leave any time before the timer ends.</p>
+      <% } %>
+    <% } else if (myPledge && myPledge.status === 'captured') { %>
+      <div class="notice ok">
+        You paid <strong><%= money(myPledge.finalAmount) %></strong> and saved <strong><%= money(myPledge.authorizedAmount - myPledge.finalAmount) %></strong>.
+        <a href="/user/orders/<%= myPledge.order %>">View your order &rarr;</a>
+      </div>
+    <% } else if (myPledge && myPledge.status === 'released') { %>
+      <div class="notice">Your card hold was released. You were not charged.</div>
+    <% } %>
+
+    <% if (currentUser && currentUser.role === 'admin' && isOpen) { %>
+      <div class="admin-box">
+        <strong>Demo tools (admin only)</strong>
+        <form action="/admin/deals/<%= deal._id %>/simulate" method="post" class="inline-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <input type="number" name="n" value="5" min="1" max="50" aria-label="Number of demo shoppers">
+          <button class="btn btn-small" type="submit">Add demo shoppers</button>
+        </form>
+        <form action="/admin/deals/<%= deal._id %>/close" method="post" class="inline">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="btn btn-small btn-ghost" type="submit">Settle deal now</button>
+        </form>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<section class="two-col">
+  <div>
+    <h2>About this product</h2>
+    <p><%= product.description %></p>
+    <p class="muted">Category: <%= product.category ? product.category.title : '' %> &middot; Code: <%= product.productCode %></p>
+  </div>
+  <div>
+    <h2>Live activity</h2>
+    <% if (events.length === 0) { %>
+      <p class="muted">No one has joined yet. Be the first!</p>
+    <% } else { %>
+      <ul class="feed">
+        <% events.forEach(function (e) { %>
+          <li class="<%= e.type %>">
+            <span><%= e.type === 'join' ? 'Someone joined' : 'Someone left' %> &middot; <%= e.count %> in the huddle</span>
+            <strong><%= money(e.price) %></strong>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>
