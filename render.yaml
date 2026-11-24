@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: huddle-store
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DEAL_CHECK_INTERVAL_MS
+        value: "30000"
