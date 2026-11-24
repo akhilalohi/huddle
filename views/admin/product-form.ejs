@@ -1,0 +1,36 @@
+<%- include('../partials/header') %>
+<%- include('../partials/admin-nav') %>
+<% var catId = product.category && product.category._id ? String(product.category._id) : String(product.category || '');
+   var created = product.createdAt ? new Date(product.createdAt) : new Date();
+   var createdStr = isNaN(created) ? '' : created.toISOString().slice(0, 10); %>
+<section class="narrow wide">
+  <a href="/admin/products" class="muted">&larr; Back to products</a>
+  <h1><%= heading %></h1>
+  <%- include('../partials/errors', { errors: errors }) %>
+
+  <form action="<%= action %>" method="post" class="form" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label>* Title <input name="title" value="<%= product.title || '' %>" required></label>
+    <label>* Product Code <input name="productCode" value="<%= product.productCode || '' %>" required></label>
+    <label>Image path or URL <input name="imagePath" value="<%= product.imagePath || '' %>" placeholder="https://... or /images/shirt.jpg (leave blank for a placeholder)"></label>
+    <label>* Description <textarea name="description" rows="4" required><%= product.description || '' %></textarea></label>
+    <div class="two">
+      <label>* Price (INR) <input type="number" name="price" min="1" step="1" value="<%= product.price || '' %>" required></label>
+      <label>* Category
+        <select name="category" required>
+          <option value="">Choose...</option>
+          <% categories.forEach(function (c) { %>
+            <option value="<%= c._id %>" <%= String(c._id) === catId ? 'selected' : '' %>><%= c.title %></option>
+          <% }) %>
+        </select>
+      </label>
+    </div>
+    <label>Manufacturer <input name="manufacturer" value="<%= product.manufacturer || '' %>"></label>
+    <div class="two">
+      <label>Created at <input type="date" name="createdAt" value="<%= createdStr %>"></label>
+      <label class="check"><input type="checkbox" name="available" <%= (product.available === undefined || product.available === true || product.available === 'on') ? 'checked' : '' %>> * Available</label>
+    </div>
+    <button class="btn" type="submit">Save</button>
+  </form>
+</section>
+<%- include('../partials/footer') %>

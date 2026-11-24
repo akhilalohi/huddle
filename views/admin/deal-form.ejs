@@ -1,0 +1,43 @@
+<%- include('../partials/header') %>
+<%- include('../partials/admin-nav') %>
+<% var tiers = (form.tiers && form.tiers.length) ? form.tiers.slice() : [];
+   while (tiers.length < 5) tiers.push({ minParticipants: '', discountPercent: '' }); %>
+<section class="narrow wide">
+  <a href="/admin/deals" class="muted">&larr; Back to deals</a>
+  <h1>New group deal</h1>
+  <%- include('../partials/errors', { errors: errors }) %>
+
+  <form action="/admin/deals" method="post" class="form" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label>Product
+      <select name="product" required>
+        <option value="">Choose...</option>
+        <% products.forEach(function (p) { %>
+          <option value="<%= p._id %>" <%= String(form.product) === String(p._id) ? 'selected' : '' %>><%= p.title %> (<%= money(p.price) %>)</option>
+        <% }) %>
+      </select>
+    </label>
+
+    <fieldset>
+      <legend>Price tiers</legend>
+      <p class="hint">The first tier is the goal: if fewer people than that join before the timer ends, the deal fails and nobody is charged. Each next tier needs more people and a bigger discount. Leave unused rows empty.</p>
+      <% tiers.forEach(function (t, i) { %>
+        <div class="two tier-row">
+          <label>Tier <%= i + 1 %> - people needed <input type="number" name="tierMin" min="2" value="<%= t.minParticipants %>"></label>
+          <label>Discount % <input type="number" name="tierDiscount" min="1" max="90" value="<%= t.discountPercent %>"></label>
+        </div>
+      <% }) %>
+    </fieldset>
+
+    <input type="hidden" name="tzOffset" value="">
+    <label>Deal ends at <small class="hint">(in your local time)</small>
+      <input type="datetime-local" name="endsAt" value="<%= form.endsAt || '' %>" required></label>
+    <div class="two">
+      <label>Max participants <small class="hint">(0 = unlimited; the deal closes early when full)</small>
+        <input type="number" name="maxParticipants" min="0" value="<%= form.maxParticipants || 0 %>"></label>
+      <label>Max units per person <input type="number" name="maxQtyPerPerson" min="1" value="<%= form.maxQtyPerPerson || 3 %>"></label>
+    </div>
+    <button class="btn" type="submit">Launch deal</button>
+  </form>
+</section>
+<%- include('../partials/footer') %>

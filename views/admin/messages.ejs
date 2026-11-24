@@ -1,0 +1,12 @@
+<%- include('../partials/header') %>
+<%- include('../partials/admin-nav') %>
+<h1>Messages</h1>
+<% if (messages.length === 0) { %><p class="muted">No messages yet.</p><% } %>
+<% messages.forEach(function (m) { %>
+  <article class="card msg">
+    <div><strong><%= m.name %></strong> &middot; <a href="mailto:<%= m.email %>"><%= m.email %></a>
+      <span class="muted">&middot; <%= m.createdAt.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' }) %></span></div>
+    <p><%= m.message %></p>
+  </article>
+<% }) %>
+<%- include('../partials/footer') %>

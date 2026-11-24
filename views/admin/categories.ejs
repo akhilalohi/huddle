@@ -1,0 +1,31 @@
+<%- include('../partials/header') %>
+<%- include('../partials/admin-nav') %>
+<h1>Categories</h1>
+
+<form action="/admin/categories" method="post" class="inline-form add-row">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <input name="title" placeholder="New category name" required>
+  <button class="btn" type="submit">Add</button>
+</form>
+
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>Name</th><th>Slug</th><th>Products</th><th></th></tr></thead>
+    <tbody>
+      <% categories.forEach(function (c) { %>
+        <tr>
+          <td><%= c.title %></td>
+          <td><code><%= c.slug %></code></td>
+          <td><%= countOf[String(c._id)] || 0 %></td>
+          <td>
+            <form action="/admin/categories/<%= c._id %>/delete" method="post" class="inline" onsubmit="return confirm('Delete this category?');">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="btn btn-small btn-ghost" type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+<%- include('../partials/footer') %>

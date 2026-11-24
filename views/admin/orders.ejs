@@ -1,0 +1,30 @@
+<%- include('../partials/header') %>
+<%- include('../partials/admin-nav') %>
+<h1>Orders</h1>
+
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>Type</th><th>Status</th></tr></thead>
+    <tbody>
+      <% if (orders.length === 0) { %><tr><td colspan="6" class="muted">No orders yet.</td></tr><% } %>
+      <% orders.forEach(function (o) { %>
+        <tr>
+          <td><%= o.createdAt.toLocaleDateString('en-IN', { dateStyle: 'medium', timeZone: 'Asia/Kolkata' }) %></td>
+          <td><%= o.user ? o.user.username : 'Deleted user' %><br><small class="muted"><%= o.user ? o.user.email : '' %></small></td>
+          <td><%= o.items.map(function (i) { return i.title + ' x' + i.qty; }).join(', ') %></td>
+          <td><%= money(o.totalCost) %></td>
+          <td><%= o.source === 'group-deal' ? 'Group deal' : 'Cart' %></td>
+          <td>
+            <form action="/admin/orders/<%= o._id %>/status" method="post" class="inline-form">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <select name="status" onchange="this.form.submit()" aria-label="Order status">
+                <% states.forEach(function (s) { %><option <%= s === o.status ? 'selected' : '' %>><%= s %></option><% }) %>
+              </select>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+<%- include('../partials/footer') %>

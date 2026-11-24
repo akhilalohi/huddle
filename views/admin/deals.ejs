@@ -1,0 +1,34 @@
+<%- include('../partials/header') %>
+<%- include('../partials/admin-nav') %>
+<div class="section-head">
+  <h1>Group deals</h1>
+  <a class="btn" href="/admin/deals/new">+ New deal</a>
+</div>
+
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>Product</th><th>Status</th><th>Joined</th><th>Goal</th><th>Price now</th><th>Ends</th><th></th></tr></thead>
+    <tbody>
+      <% if (deals.length === 0) { %><tr><td colspan="7" class="muted">No deals yet.</td></tr><% } %>
+      <% deals.forEach(function (item) { var d = item.deal, s = item.snap; %>
+        <tr>
+          <td><a href="/deals/<%= d._id %>"><%= d.product.title %></a></td>
+          <td><span class="status s-<%= d.status === 'succeeded' ? 'delivered' : d.status === 'failed' ? 'cancelled' : 'packed' %>"><%= d.status %></span></td>
+          <td><%= s.count %><%= d.maxParticipants ? ' / ' + d.maxParticipants : '' %></td>
+          <td><%= s.tippingPoint %> to go ahead</td>
+          <td><%= d.status === 'succeeded' ? money(d.finalPrice) : money(s.currentPrice) %></td>
+          <td><%= d.endsAt.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' }) %></td>
+          <td class="row-actions">
+            <% if (d.status === 'open') { %>
+              <form action="/admin/deals/<%= d._id %>/close" method="post" class="inline" onsubmit="return confirm('Settle this deal now?');">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="btn btn-small btn-ghost" type="submit">Settle now</button>
+              </form>
+            <% } %>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+<%- include('../partials/footer') %>
