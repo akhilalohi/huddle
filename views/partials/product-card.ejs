@@ -1,0 +1,22 @@
+<%# expects: product, optional deal (open Deal for this product) %>
+<article class="card product-card">
+  <button class="card-img" type="button" data-image-preview data-image-src="<%= imgSrc(product) %>" data-image-alt="<%= product.title %>" aria-label="View image of <%= product.title %>">
+    <img src="<%= imgSrc(product) %>" alt="" loading="lazy">
+    <% if (typeof deal !== 'undefined' && deal) { %><span class="chip deal-chip">&#9889; Group deal</span><% } %>
+  </button>
+  <div class="card-body">
+    <a href="/products/<%= product._id %>" class="card-title"><%= product.title %></a>
+    <div class="price"><%= money(product.price) %></div>
+    <% if (typeof deal !== 'undefined' && deal) { %>
+      <a class="deal-hint" href="/deals/<%= deal._id %>">Down to <%= money(Math.min.apply(null, deal.tiers.map(function (t) { return Math.round(product.price * (1 - t.discountPercent / 100)); }))) %> with a huddle</a>
+    <% } %>
+    <% if (product.available) { %>
+      <form action="/cart/add/<%= product._id %>" method="post">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="btn btn-block" type="submit">Add to Shopping Cart</button>
+      </form>
+    <% } else { %>
+      <button class="btn btn-block" disabled>Out of stock</button>
+    <% } %>
+  </div>
+</article>

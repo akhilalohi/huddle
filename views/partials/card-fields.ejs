@@ -1,0 +1,13 @@
+<%# Delivery + test-mode card fields. Card number / CVC are never pre-filled. %>
+<label>Delivery address
+  <textarea name="address" rows="3" minlength="10" required placeholder="House no., street, city, PIN"><%= form.address || '' %></textarea>
+</label>
+<label>Name on card <input name="cardName" value="<%= form.cardName || '' %>" autocomplete="cc-name" required></label>
+<label>Card number
+  <input name="cardNumber" inputmode="numeric" autocomplete="cc-number" placeholder="4242 4242 4242 4242" maxlength="23" required>
+</label>
+<div class="two">
+  <label>Expiry (MM/YY) <input name="expiry" placeholder="12/30" autocomplete="cc-exp" maxlength="5" required></label>
+  <label>CVC <input name="cvc" inputmode="numeric" autocomplete="cc-csc" maxlength="4" required></label>
+</div>
+<p class="hint">Test mode: use <code>4242 4242 4242 4242</code>, any future expiry, any CVC. A card ending <code>0002</code> is always declined. No real card data is stored.</p>

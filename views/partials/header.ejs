@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= pageName ? pageName + " | Huddle" : "Huddle - Shop together, pay less" %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap header-row">
+    <form class="search" action="/products/search" method="get" role="search">
+      <input type="search" name="search" placeholder="Search products" maxlength="60" value="<%= typeof search !== 'undefined' ? search : '' %>" aria-label="Search products">
+      <button type="submit" aria-label="Search">&#128269;</button>
+    </form>
+
+    <a class="logo" href="/"><span class="logo-mark">H</span> Huddle</a>
+
+    <nav class="account" aria-label="Account">
+      <a href="/cart" class="cart-link" aria-label="Cart">&#128722;<span class="badge"><%= cartQty %></span></a>
+      <% if (currentUser) { %>
+        <% if (currentUser.role === 'admin') { %><a href="/admin">Admin</a><% } %>
+        <a href="/user/profile">Hi, <%= currentUser.username.split(' ')[0] %></a>
+        <form action="/user/logout" method="post" class="inline">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="link-btn" type="submit">Sign out</button>
+        </form>
+      <% } else { %>
+        <a href="/user/signup">Sign Up</a>
+        <a href="/user/signin">Sign In</a>
+      <% } %>
+    </nav>
+  </div>
+  <nav class="category-bar" aria-label="Categories">
+    <a href="/products">All</a>
+    <a href="/products?category=men">Men</a>
+    <a href="/products?category=women">Women</a>
+    <a href="/products?category=kids">Kids</a>
+    <a href="/deals" class="deals-link">&#9889; Group Deals</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <% success.forEach(function (m) { %><div class="alert ok" role="status"><%= m %></div><% }) %>
+  <% error.forEach(function (m) { %><div class="alert bad" role="alert"><%= m %></div><% }) %>

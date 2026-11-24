@@ -1,0 +1,39 @@
+<%# expects: item = { deal, snap } %>
+<% var d = item.deal, s = item.snap, p = d.product; %>
+<article class="card deal-card">
+  <button class="card-img" type="button" data-image-preview data-image-src="<%= imgSrc(p) %>" data-image-alt="<%= p.title %>" aria-label="View image of <%= p.title %>">
+    <img src="<%= imgSrc(p) %>" alt="" loading="lazy">
+    <% if (d.status === 'open') { %>
+      <span class="chip time-chip" data-countdown="<%= d.endsAt.toISOString() %>"><%= timeLeft(d.endsAt) %></span>
+    <% } else if (d.status === 'succeeded') { %>
+      <span class="chip ok-chip">Succeeded</span>
+    <% } else { %>
+      <span class="chip bad-chip">Not enough people</span>
+    <% } %>
+  </button>
+  <div class="card-body">
+    <a href="/deals/<%= d._id %>" class="card-title"><%= p.title %></a>
+
+    <% if (d.status === 'open') { %>
+      <div class="price-row">
+        <span class="price now"><%= money(s.currentPrice) %></span>
+        <% if (s.currentPrice < s.basePrice) { %><s class="was"><%= money(s.basePrice) %></s><% } %>
+      </div>
+      <div class="meter" role="progressbar" aria-valuenow="<%= s.percentToTop %>" aria-valuemin="0" aria-valuemax="100">
+        <span style="width: <%= s.percentToTop %>%"></span>
+      </div>
+      <div class="meter-note">
+        <strong><%= s.count %></strong> joined
+        <% if (!s.thresholdMet) { %>&middot; needs <%= s.tippingPoint - s.count %> more to go ahead
+        <% } else if (s.nextTier) { %>&middot; <%= s.needed %> more &rarr; <%= money(s.nextPrice) %>
+        <% } else { %>&middot; best price unlocked<% } %>
+      </div>
+      <a class="btn btn-block" href="/deals/<%= d._id %>">View deal</a>
+    <% } else if (d.status === 'succeeded') { %>
+      <div class="price-row"><span class="price now"><%= money(d.finalPrice) %></span><s class="was"><%= money(s.basePrice) %></s></div>
+      <div class="meter-note"><%= d.finalParticipants %> people joined</div>
+    <% } else { %>
+      <div class="meter-note"><%= d.finalParticipants || 0 %> joined, needed <%= s.tippingPoint %>. Nobody was charged.</div>
+    <% } %>
+  </div>
+</article>
